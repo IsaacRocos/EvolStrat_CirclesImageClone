@@ -46,9 +46,6 @@ class Circulo(object):
         #self.checkEdges2()
         
 
-
-
-
     def checkEdges(self):
         if self.coorX >= self.windowWidth or self.coorX <= 0:
             self.velocity.x = self.velocity.x * -1

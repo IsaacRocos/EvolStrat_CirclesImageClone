@@ -9,7 +9,7 @@ from Circulo import Circulo
 
 NUMBER_BALLS = 10
 
-class Test(object):
+class Generador(object):
     '''
     classdocs
     '''
@@ -59,7 +59,7 @@ class Test(object):
         pygame.init()
         FPSCLOCK = pygame.time.Clock()
         self.DISPLAYSURF = pygame.display.set_mode((self.WINDOWWIDTH, self.WINDOWHEIGHT))
-        self.DISPLAYSURF.fill(Test.WHITE)
+        self.DISPLAYSURF.fill(Generador.WHITE)
         while True:
             for event in pygame.event.get(): # event handling loop
                 if (event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE)):
@@ -72,10 +72,10 @@ class Test(object):
                 if (event.type == KEYUP and event.key == K_BACKSPACE):
                     print 'Borrando anterior'
                     self.borrarCirculo()
-                self.DISPLAYSURF.fill(Test.WHITE)
+                self.DISPLAYSURF.fill(Generador.WHITE)
                 self.dibujarCirculos()()        
                 pygame.display.update()
                 FPSCLOCK.tick(self.FPS)
 
-prueba = Test(800,800,30)
+prueba = Generador(800,800,30)
 prueba.start()
