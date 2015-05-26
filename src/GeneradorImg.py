@@ -26,7 +26,7 @@ class Generador(object):
         self.imagen  = pygame.image.load(self.nombreImagen)
         self.WINDOWWIDTH = self.imagen.get_size()[0]
         self.WINDOWHEIGHT = self.imagen.get_size()[1]
-        self.aptitud = 1000000
+        self.aptitud = 100000
         self.FPS = FPS
         self.circulos = []
         
@@ -50,7 +50,7 @@ class Generador(object):
         (col, col , col ,  100),
         x =random.randint(0,self.WINDOWWIDTH),
         y =random.randint(0,self.WINDOWHEIGHT), 
-        r =random.randint(10,50)
+        r =random.randint(5,90)
         )
         self.circulos.append(nuevoCirculo)
         print nuevoCirculo
@@ -110,30 +110,29 @@ class Generador(object):
                     pygame.quit()
                     print 'Fin de ejecucion'
                     sys.exit()
-                if event.type == MOUSEBUTTONUP:
-                    self.mousex, self.mousey = event.pos
-                    print "Click en: ",self.mousex,self.mousey,' RGBA:',self.DISPLAYSURF.get_at((self.mousex,self.mousey))
-                if (event.type == KEYUP and event.key == K_SPACE):
-                    print 'Agregando circulo'
-                    self.nuevoCirculo()
-                    evaluar = 1
-                if (event.type == KEYUP and event.key == K_BACKSPACE):
-                    print 'Borrando anterior'
-                    self.borrarCirculo()
+#                 if event.type == MOUSEBUTTONUP:
+#                     self.mousex, self.mousey = event.pos
+#                     print "Click en: ",self.mousex,self.mousey,' RGBA:',self.DISPLAYSURF.get_at((self.mousex,self.mousey))
+#                 if (event.type == KEYUP and event.key == K_SPACE):
+#                     print 'Agregando circulo'
+#                     self.nuevoCirculo()
+#                     evaluar = 1
+#                 if (event.type == KEYUP and event.key == K_BACKSPACE):
+#                     print 'Borrando anterior'
+#                     self.borrarCirculo()
+                self.nuevoCirculo()
                 self.actualizar()
-                if(evaluar == 1):
-                    evaluar=0
-                    apt = self.evaluarAptitud()
-                    if(apt < self.aptitud):
-                        print 'H-APT:',apt,'<','P_APT:',self.aptitud
-                        self.aptitud = apt
-                        self.actualizar()
-                    else:
-                        print 'H-APT:',apt,' no supera a padre'
-                        self.borrarCirculo()
-                        self.actualizar()
+                apt = self.evaluarAptitud()
+                if(apt < self.aptitud):
+                    print 'H-APT:',apt,'<','P_APT:',self.aptitud
+                    self.aptitud = apt
+                else:
+                    print 'H-APT:',apt,' no supera a padre'
+                    print 'Desechando hijo'
+                    self.borrarCirculo()
+                    self.actualizar()
                         
-prueba = Generador(20)
+prueba = Generador(10)
 prueba.start()
 
 
