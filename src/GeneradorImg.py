@@ -3,12 +3,11 @@ Created on 24/05/2015
 
 @author: Isaac
 '''
-import random, pygame, sys
+import random, pygame, sys #, thread
 from pygame.locals import *
 from Circulo import Circulo
 from math import sqrt
-
-NUMBER_BALLS = 10
+#import time
 
 class Generador(object):
     '''
@@ -29,6 +28,8 @@ class Generador(object):
         self.aptitud = 100000
         self.FPS = FPS
         self.circulos = []
+        self.ventanaAnalisis = []
+        self.numeroCirculos = 0
         
 
     def verificaArgumentos(self):
@@ -40,25 +41,34 @@ class Generador(object):
         print 'Imagen a imitar: ', self.nombreImagen
 
 
+
+#     def blancoYNegro(self): # generar colores blanco-negro-gris
+#         coloresBW = []
+#         coloresBW.append(random.randint(0,100)) # para grises
+#         coloresBW.append(random.randint(200,255)) # para blancos
+#         col = coloresBW[random.randint(0,1)]
+#         
+
     def nuevoCirculo(self):
         print 'Generando nuevo circulo'
-        col = random.randint(0,100) # para grises
         nuevoCirculo = Circulo(
         self.WINDOWWIDTH, 
         self.WINDOWHEIGHT, 
-        #(random.randint(0,255) , random.randint(0,255) , random.randint(0,255) ,  100), #para colores aleatorios
-        (col, col , col ,  100),
-        x =random.randint(0,self.WINDOWWIDTH),
-        y =random.randint(0,self.WINDOWHEIGHT), 
-        r =random.randint(5,90)
+        (random.randint(0,255) , random.randint(0,255) , random.randint(0,255) ,  100), #para colores aleatorios
+        x =random.randint(0,self.WINDOWWIDTH) ,
+        y =random.randint(0,self.WINDOWHEIGHT) , 
+        r =random.randint(1,50)
         )
+        self.numeroCirculos += 1
         self.circulos.append(nuevoCirculo)
-        print nuevoCirculo
+        print 'Circulo ' , self.numeroCirculos , nuevoCirculo
         
+
     
     def borrarCirculo(self):
         if(len(self.circulos)>0):
             self.circulos.pop()
+            self.numeroCirculos -= 1
 
     
     def dibujarCirculos(self):        
@@ -66,6 +76,46 @@ class Generador(object):
             ball.display(self.DISPLAYSURF)
         pygame.display.flip()
 
+    
+#     def definirVentana(self):
+#         centro = self.circulos[self.numeroCirculos-1].getCentro()
+#         x = centro[0]
+#         y = centro[1]
+#         radio = self.circulos[self.numeroCirculos-1].getRadio()
+#         
+#         inicioX = 0
+#         finX    = self.WINDOWWIDTH-1
+#         inicioY = 0
+#         finY    = self.WINDOWHEIGHT-1
+#     
+#         if(x - radio > 0):
+#             inicioX = x - radio
+#         if(x + radio < self.WINDOWWIDTH):
+#             finX= x + radio
+#         if(y - radio > 0):
+#             inicioY = y - radio 
+#         if(y + radio < self.WINDOWHEIGHT):
+#             finY = y + radio
+#         
+#         self.ventanaAnalisis = [inicioX,finX,inicioY,finY]
+#         print 'Ventana: ', inicioX , ',' , inicioY , ';' ,finX, ',', inicioY , ';', inicioX , ',' , finY , ';' ,finX, ',', finY
+#         
+#     #Para comparar unicamente las regines que corresponden al nuevo circulo generado y evitar recorrer por completo ambas imagenes 
+#     def evaluarAptitudVentana(self):
+#         self.definirVentana()
+#         print 'Analizando nueva imagen ...'
+#         sumM = 0
+#         for x in range (self.ventanaAnalisis[0] , (self.ventanaAnalisis[1]+1)): #leer pixeles hacia derecha
+#             sumN = 0
+#             for y in range (self.ventanaAnalisis[2] , (self.ventanaAnalisis[3]+1)): #leer pixeles hacia abajo
+#                 print 'Analizando pixel ' , x , ',', y 
+#                 pixelIMG = self.imagen.get_at((x,y))
+#                 pixelSURF = self.DISPLAYSURF.get_at((x,y))
+#                 nvopixel = self.restaPixel(pixelIMG, pixelSURF)
+#                 sumN += nvopixel 
+#             sumM += sumN
+#         return sqrt(sumM)
+    
     
     def evaluarAptitud(self):
         print 'Analizando nueva imagen ...'
@@ -89,11 +139,13 @@ class Generador(object):
         return (npr**2 + npg**2 + npb**2  + npa**2 + 0.0) / 4.0
 
     def actualizar(self):
+        #while True:
+        print 'Actualizando ventana...'
         self.DISPLAYSURF.fill(Generador.WHITE)
         self.dibujarCirculos()
         pygame.display.update()
         FPSCLOCK.tick(self.FPS)
-    
+        #time.sleep(tiempo)
     
     def start(self):
         print "Generando..."
@@ -103,36 +155,40 @@ class Generador(object):
         FPSCLOCK = pygame.time.Clock()
         self.DISPLAYSURF = pygame.display.set_mode((self.WINDOWWIDTH, self.WINDOWHEIGHT))
         self.DISPLAYSURF.fill(Generador.WHITE)
-        evaluar = 0
+        numeroImagen = 0
+        exitos = 0
+        #thread.start_new_thread(self.actualizar, tuple([60]))
         while True:
             for event in pygame.event.get(): # event handling loop
                 if (event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE)):
+                    print 'Salvando ultima imagen'
+                    imgNombre= 'last_'+self.nombreImagen
+                    pygame.image.save(self.DISPLAYSURF,imgNombre)
                     pygame.quit()
                     print 'Fin de ejecucion'
                     sys.exit()
-#                 if event.type == MOUSEBUTTONUP:
-#                     self.mousex, self.mousey = event.pos
-#                     print "Click en: ",self.mousex,self.mousey,' RGBA:',self.DISPLAYSURF.get_at((self.mousex,self.mousey))
-#                 if (event.type == KEYUP and event.key == K_SPACE):
-#                     print 'Agregando circulo'
-#                     self.nuevoCirculo()
-#                     evaluar = 1
-#                 if (event.type == KEYUP and event.key == K_BACKSPACE):
-#                     print 'Borrando anterior'
-#                     self.borrarCirculo()
-                self.nuevoCirculo()
-                self.actualizar()
-                apt = self.evaluarAptitud()
-                if(apt < self.aptitud):
-                    print 'H-APT:',apt,'<','P_APT:',self.aptitud
-                    self.aptitud = apt
-                else:
-                    print 'H-APT:',apt,' no supera a padre'
-                    print 'Desechando hijo'
-                    self.borrarCirculo()
-                    self.actualizar()
-                        
-prueba = Generador(10)
+            
+            self.nuevoCirculo()
+            self.actualizar()
+            apt = self.evaluarAptitud()
+            #apt = self.evaluarAptitudVentana()
+            if(apt < self.aptitud):
+                print '[OK] H-APT:',apt,'<','P_APT:',self.aptitud
+                self.aptitud = apt
+                exitos +=1
+            else:
+                print 'H-APT:',apt,' no supera a padre'
+                print '[X]Desechando hijo'
+                self.borrarCirculo()
+                #self.actualizar()
+            if(exitos == 200):
+                imgNombre= 'N'+ str(numeroImagen) + '_' +self.nombreImagen
+                print '<Guardando imagen: ' + imgNombre,'>'
+                pygame.image.save(self.DISPLAYSURF,imgNombre)
+                exitos = 0
+                numeroImagen +=1
+            
+prueba = Generador(5)
 prueba.start()
 
 
